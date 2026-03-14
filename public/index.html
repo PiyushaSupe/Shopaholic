@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClosetFlow — Your Smart Wardrobe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0E6;
+    --warm: #E8D5B7;
+    --sand: #C9A96E;
+    --terracotta: #C4622D;
+    --deep: #2C1810;
+    --espresso: #4A2C2A;
+    --sage: #7A8C6E;
+    --blush: #E8A598;
+    --ink: #1A1208;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--deep);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ─── BACKGROUND TEXTURE ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(196, 98, 45, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(122, 140, 110, 0.08) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A96E' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(247, 240, 230, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.2);
+  }
+
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    position: relative;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .brand span.cf-c { color: var(--terracotta); }
+  .brand span.cf-l { color: var(--espresso); }
+  .brand span.cf-o { color: var(--sand); }
+  .brand span.cf-s { color: var(--terracotta); }
+  .brand span.cf-e { color: var(--espresso); }
+  .brand span.cf-t { color: var(--sage); }
+  .brand::after {
+    content: 'flow';
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 1.6rem;
+    color: var(--espresso);
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+  .brand-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: var(--sand);
+    text-transform: uppercase;
+    display: block;
+    margin-top: -0.3rem;
+  }
+
+  .nav-btns { display: flex; gap: 1rem; align-items: center; }
+  .btn-ghost {
+    padding: 0.6rem 1.5rem;
+    border: 1.5px solid var(--espresso);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--espresso);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { background: var(--espresso); color: var(--cream); }
+  .btn-solid {
+    padding: 0.6rem 1.5rem;
+    border: 1.5px solid var(--terracotta);
+    border-radius: 2px;
+    background: var(--terracotta);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-solid:hover { background: var(--espresso); border-color: var(--espresso); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    gap: 4rem;
+  }
+  .hero-left { flex: 1; max-width: 600px; }
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block; width: 2rem; height: 1.5px;
+    background: var(--terracotta);
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--terracotta);
+    display: block;
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--espresso);
+    opacity: 0.75;
+    max-width: 460px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  }
+  .cta-main {
+    padding: 1rem 2.5rem;
+    background: var(--terracotta);
+    color: #fff;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-main::after {
+    content: '→';
+    margin-left: 0.5rem;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .cta-main:hover { background: var(--espresso); }
+  .cta-main:hover::after { transform: translateX(4px); }
+  .cta-secondary {
+    font-size: 0.9rem;
+    color: var(--espresso);
+    opacity: 0.7;
+    cursor: pointer;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cta-secondary:hover { opacity: 1; }
+
+  /* ─── HERO VISUAL ─── */
+  .hero-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .wardrobe-illustration {
+    width: 420px; height: 480px;
+    background: var(--espresso);
+    border-radius: 8px 8px 4px 4px;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(44, 24, 16, 0.3);
+    overflow: hidden;
+  }
+  .wardrobe-illustration::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 100%;
+    background: rgba(247, 240, 230, 0.2);
+    z-index: 2;
+  }
+  .wardrobe-top {
+    background: rgba(247, 240, 230, 0.08);
+    height: 50px;
+    border-bottom: 2px solid rgba(247, 240, 230, 0.15);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wardrobe-rod {
+    width: 80%; height: 4px;
+    background: var(--sand);
+    border-radius: 2px;
+    position: relative;
+  }
+  .hangers-row {
+    display: flex;
+    gap: 6px;
+    padding: 8px 20px;
+    flex-wrap: wrap;
+  }
+  .hanger {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .hanger-hook { width: 2px; height: 12px; background: var(--sand); }
+  .hanger-bar { width: 40px; height: 2px; background: var(--sand); border-radius: 1px; }
+  .garment {
+    width: 40px; height: 52px;
+    border-radius: 0 0 6px 6px;
+    position: relative;
+    transition: transform 0.3s;
+  }
+  .garment:hover { transform: translateY(-3px); }
+  .g1 { background: linear-gradient(135deg, #C4622D, #E8A598); }
+  .g2 { background: linear-gradient(135deg, #7A8C6E, #A8C196); }
+  .g3 { background: linear-gradient(135deg, #4A2C2A, #8B5E3C); }
+  .g4 { background: linear-gradient(135deg, #C9A96E, #E8D5B7); }
+  .g5 { background: linear-gradient(135deg, #2C4A6E, #5B8DB8); }
+  .g6 { background: linear-gradient(135deg, #6E2C4A, #B85B8D); }
+  .wardrobe-shelf {
+    background: rgba(201, 169, 110, 0.3);
+    height: 8px;
+    margin: 4px 16px;
+    border-radius: 2px;
+  }
+  .shelf-items {
+    display: flex; gap: 8px; padding: 8px 20px; flex-wrap: wrap;
+  }
+  .shelf-item {
+    width: 45px; height: 35px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--sand), var(--warm));
+    opacity: 0.8;
+  }
+  .si2 { background: linear-gradient(135deg, #C4622D, #E88060); }
+  .si3 { background: linear-gradient(135deg, #7A8C6E, #A0B490); }
+  .floating-tag {
+    position: absolute;
+    padding: 0.4rem 0.8rem;
+    background: var(--cream);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(44,24,16,0.2);
+    animation: floatTag 3s ease-in-out infinite;
+  }
+  .tag1 { top: 20%; right: -80px; color: var(--sage); animation-delay: 0s; }
+  .tag2 { top: 50%; right: -100px; color: var(--terracotta); animation-delay: 1s; }
+  .tag3 { top: 75%; right: -90px; color: var(--espresso); animation-delay: 2s; }
+  @keyframes floatTag {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* ─── FEATURES ─── */
+  .features {
+    position: relative; z-index: 1;
+    padding: 5rem 4rem;
+    background: var(--espresso);
+  }
+  .features-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .features-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--cream);
+    margin-bottom: 0.75rem;
+  }
+  .features-header p {
+    color: rgba(247,240,230,0.55);
+    font-size: 1rem;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .feat-card {
+    padding: 2rem;
+    background: rgba(247,240,230,0.05);
+    border: 1px solid rgba(247,240,230,0.1);
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+  .feat-card:hover {
+    background: rgba(247,240,230,0.1);
+    transform: translateY(-4px);
+  }
+  .feat-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .feat-card h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .feat-card p {
+    color: rgba(247,240,230,0.5);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* ─── AUTH MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,18,8,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--cream);
+    width: 100%;
+    max-width: 460px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(26,18,8,0.4);
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-header {
+    background: var(--espresso);
+    padding: 2rem 2.5rem 1.5rem;
+    position: relative;
+  }
+  .modal-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+  }
+  .modal-header p {
+    color: rgba(247,240,230,0.55);
+    font-size: 0.85rem;
+  }
+  .modal-close {
+    position: absolute; top: 1.2rem; right: 1.5rem;
+    background: none; border: none;
+    color: rgba(247,240,230,0.5);
+    font-size: 1.5rem; cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--cream); }
+  .modal-body { padding: 2rem 2.5rem; }
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--espresso);
+    margin-bottom: 0.4rem;
+    opacity: 0.8;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid rgba(74,44,42,0.2);
+    border-radius: 2px;
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--deep);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus { border-color: var(--terracotta); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .submit-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--terracotta);
+    color: #fff;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: var(--espresso); }
+  .switch-link {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.85rem;
+    color: var(--espresso);
+    opacity: 0.7;
+  }
+  .switch-link a {
+    color: var(--terracotta);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .switch-link a:hover { text-decoration: underline; }
+  .error-msg {
+    background: rgba(196,98,45,0.1);
+    border: 1px solid rgba(196,98,45,0.3);
+    color: var(--terracotta);
+    padding: 0.7rem 1rem;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .success-msg {
+    background: rgba(122,140,110,0.1);
+    border: 1px solid rgba(122,140,110,0.3);
+    color: var(--sage);
+    padding: 0.7rem 1rem;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative; z-index: 1;
+    background: var(--ink);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1.5rem;
+    opacity: 0.8;
+  }
+  .footer-brand::after {
+    content: 'flow';
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 1.2rem;
+    opacity: 0.5;
+  }
+  footer p {
+    color: rgba(247,240,230,0.35);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { flex-direction: column; padding: 6rem 1.5rem 3rem; }
+    .hero-right { display: none; }
+    .features { padding: 3rem 1.5rem; }
+    footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+    .modal { margin: 1rem; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div>
+    <a href="/" class="brand" style="text-decoration:none;">
+      <span style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--espresso); letter-spacing:-0.02em;">
+        <span style="color:var(--terracotta)">C</span>loset
+      </span>
+    </a>
+    <span style="font-family:'DM Sans',sans-serif; font-weight:300; font-size:1.6rem; color:var(--espresso); letter-spacing:0.08em; opacity:0.6;">flow</span>
+    <span class="brand-tag">Your Smart Wardrobe</span>
+  </div>
+  <div class="nav-btns">
+    <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
+    <button class="btn-solid" onclick="openModal('register')">Get Started</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Smart Wardrobe Management</div>
+    <h1 class="hero-title">
+      Dress with
+      <em>intention,</em>
+      not repetition.
+    </h1>
+    <p class="hero-sub">
+      ClosetFlow helps you track every piece in your wardrobe — know what you own, what you've worn, and what needs washing. Your closet, perfectly organised.
+    </p>
+    <div class="hero-cta">
+      <a class="cta-main" onclick="openModal('register')">Start Organizing</a>
+      <button class="cta-secondary" onclick="openModal('login')">Already have an account</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="wardrobe-illustration">
+      <div class="wardrobe-top">
+        <div class="wardrobe-rod"></div>
+      </div>
+      <div class="hangers-row">
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g1"></div></div>
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g2"></div></div>
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g3"></div></div>
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g4"></div></div>
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g5"></div></div>
+        <div class="hanger"><div class="hanger-hook"></div><div class="hanger-bar"></div><div class="garment g6"></div></div>
+      </div>
+      <div class="wardrobe-shelf"></div>
+      <div class="shelf-items">
+        <div class="shelf-item"></div>
+        <div class="shelf-item si2"></div>
+        <div class="shelf-item si3"></div>
+        <div class="shelf-item"></div>
+        <div class="shelf-item si2"></div>
+      </div>
+      <div class="wardrobe-shelf"></div>
+      <div class="shelf-items">
+        <div class="shelf-item si3"></div>
+        <div class="shelf-item"></div>
+        <div class="shelf-item si2"></div>
+        <div class="shelf-item si3"></div>
+      </div>
+    </div>
+    <div class="floating-tag tag1">✓ 42 items tracked</div>
+    <div class="floating-tag tag2">🧺 3 in laundry</div>
+    <div class="floating-tag tag3">✨ 5 not worn yet</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-header">
+    <h2>Everything your wardrobe needs</h2>
+    <p>From adding items to tracking wear — all in one beautiful place</p>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">👗</div>
+      <h3>Visual Closet</h3>
+      <p>See your clothes organized in beautiful digital cupboards by section — tops, bottoms, dresses and more.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🧺</div>
+      <h3>Laundry Tracker</h3>
+      <p>Drag worn items to the laundry bag. Track what's dirty, what's clean, and what needs attention.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <h3>Wear Analytics</h3>
+      <p>Know exactly how many times each item has been worn and washed. Never repeat outfits unintentionally.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">✏️</div>
+      <h3>Easy Updates</h3>
+      <p>Made a mistake? Update any clothing detail instantly — color, name, section, fiber and more.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Closet</div>
+  <p>© 2024 ClosetFlow. Your personal wardrobe assistant.</p>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Welcome back</h2>
+      <p>Sign in to your ClosetFlow account</p>
+      <button class="modal-close" onclick="closeModal('login')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="error-msg" id="loginError"></div>
+      <div class="success-msg" id="loginSuccess"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+      <button class="submit-btn" onclick="handleLogin()">Sign In</button>
+      <p class="switch-link">Don't have an account? <a onclick="switchModal('register')">Create one →</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Join ClosetFlow</h2>
+      <p>Create your wardrobe account</p>
+      <button class="modal-close" onclick="closeModal('register')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="error-msg" id="registerError"></div>
+      <div class="success-msg" id="registerSuccess"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regFullName" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="regUsername" placeholder="Choose username">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="your@email.com">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Min. 6 characters">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="regConfirm" placeholder="Repeat password">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="handleRegister()">Create Account</button>
+      <p class="switch-link">Already have an account? <a onclick="switchModal('login')">Sign in →</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Check if already logged in via localStorage token
+  window.onload = async () => {
+    const token = localStorage.getItem('cf_token');
+    if (!token) return; // not logged in, stay on landing page
+    try {
+      const res = await fetch('/api/me', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (res.ok) window.location.href = '/dashboard';
+      else localStorage.clear(); // stale token, clear it
+    } catch {}
+  };
+
+  function openModal(type) {
+    document.getElementById(type + 'Modal').classList.add('active');
+  }
+  function closeModal(type) {
+    document.getElementById(type + 'Modal').classList.remove('active');
+  }
+  function switchModal(to) {
+    closeModal(to === 'login' ? 'register' : 'login');
+    openModal(to);
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) m.classList.remove('active');
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+  });
+
+  function showMsg(id, msg, isError = true) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+
+  async function handleLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!username || !password) return showMsg('loginError', 'Please fill all fields');
+
+    const btn = document.querySelector('#loginModal .submit-btn');
+    btn.textContent = 'Signing in...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showMsg('loginError', data.error || 'Invalid credentials');
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        return;
+      }
+      localStorage.setItem('cf_token', data.token);
+      localStorage.setItem('cf_user', JSON.stringify(data.user));
+      window.location.href = '/dashboard';
+    } catch {
+      showMsg('loginError', 'Connection error. Is the server running?');
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+    }
+  }
+
+  async function handleRegister() {
+    const fullName = document.getElementById('regFullName').value.trim();
+    const username = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+
+    if (!fullName || !username || !email || !password) return showMsg('registerError', 'Please fill all fields');
+    if (password.length < 6) return showMsg('registerError', 'Password must be at least 6 characters');
+    if (password !== confirm) return showMsg('registerError', 'Passwords do not match');
+
+    const btn = document.querySelector('#registerModal .submit-btn');
+    btn.textContent = 'Creating account...';
+    btn.disabled = true;
+
+    try {
+      // Step 1: Register
+      const regRes = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, username, email, password })
+      });
+      const regData = await regRes.json();
+      if (!regRes.ok) {
+        showMsg('registerError', regData.error || 'Registration failed');
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+        return;
+      }
+
+      // Step 2: Auto-login immediately after register
+      const loginRes = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const loginData = await loginRes.json();
+      if (!loginRes.ok) {
+        // Register worked but login failed — send to login page with username pre-filled
+        showMsg('registerSuccess', 'Account created! Please sign in.', false);
+        document.getElementById('registerSuccess').style.display = 'block';
+        setTimeout(() => {
+          switchModal('login');
+          document.getElementById('loginUsername').value = username;
+        }, 1200);
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+        return;
+      }
+
+      // All good — save token and go to dashboard
+      localStorage.setItem('cf_token', loginData.token);
+      localStorage.setItem('cf_user', JSON.stringify(loginData.user));
+      window.location.href = '/dashboard';
+
+    } catch {
+      showMsg('registerError', 'Connection error. Is the server running?');
+      btn.textContent = 'Create Account';
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('loginPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  document.getElementById('regConfirm').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleRegister();
+  });
+</script>
+</body>
+</html>

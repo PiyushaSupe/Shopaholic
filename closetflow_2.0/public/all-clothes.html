@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Clothes — ClosetFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F7F0E6;--warm:#E8D5B7;--sand:#C9A96E;--terracotta:#C4622D;--deep:#2C1810;--espresso:#4A2C2A;--sage:#7A8C6E;--blush:#E8A598;--ink:#1A1208;--sidebar-w:240px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--deep);display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--espresso);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto;}
+.sidebar-brand{padding:1.8rem 1.5rem 1.2rem;border-bottom:1px solid rgba(247,240,230,0.1);}
+.sidebar-brand .brand-name{font-family:'Playfair Display',serif;color:var(--cream);font-size:1.6rem;font-weight:900;}
+.sidebar-brand .brand-sub{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,240,230,0.4);margin-top:0.2rem;}
+.sidebar-user{padding:1.2rem 1.5rem;border-bottom:1px solid rgba(247,240,230,0.08);display:flex;align-items:center;gap:0.8rem;}
+.user-avatar{width:38px;height:38px;background:var(--terracotta);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.9rem;flex-shrink:0;}
+.user-info .name{color:var(--cream);font-size:0.85rem;font-weight:600;}
+.user-info .uname{color:rgba(247,240,230,0.4);font-size:0.72rem;}
+.sidebar-nav{flex:1;padding:1rem 0;}
+.nav-section-title{padding:0.8rem 1.5rem 0.4rem;font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
+.nav-item{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1.5rem;color:rgba(247,240,230,0.6);text-decoration:none;font-size:0.88rem;font-weight:500;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{color:var(--cream);background:rgba(247,240,230,0.06);}
+.nav-item.active{color:var(--cream);background:rgba(247,240,230,0.1);border-left-color:var(--terracotta);}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center;}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid rgba(247,240,230,0.08);}
+.logout-btn{display:flex;align-items:center;gap:0.6rem;color:rgba(247,240,230,0.4);font-size:0.83rem;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color 0.2s;padding:0.3rem 0;}
+.logout-btn:hover{color:var(--blush);}
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+.topbar{background:rgba(247,240,230,0.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,169,110,0.2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;}
+.page-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--ink);}
+.page-sub{font-size:0.8rem;color:var(--espresso);opacity:0.6;margin-top:0.1rem;}
+.content{padding:2rem;flex:1;}
+
+/* SECTION TABS */
+.section-tabs{
+  display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:2rem;
+}
+.sec-tab{
+  padding:0.45rem 1.1rem;
+  border:1.5px solid rgba(74,44,42,0.2);
+  border-radius:20px;
+  font-size:0.8rem;font-weight:600;
+  cursor:pointer;background:#fff;
+  color:var(--espresso);
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.sec-tab:hover,.sec-tab.active{background:var(--espresso);color:var(--cream);border-color:var(--espresso);}
+.sec-tab .count{
+  background:rgba(247,240,230,0.2);
+  padding:0.05rem 0.4rem;border-radius:10px;
+  font-size:0.7rem;
+}
+.sec-tab.active .count{background:rgba(247,240,230,0.15);}
+
+/* SEARCH ROW */
+.search-row{
+  display:flex;gap:1rem;align-items:center;
+  margin-bottom:1.2rem;
+}
+.search-input{
+  flex:1;max-width:340px;
+  padding:0.65rem 1rem;
+  border:1.5px solid rgba(74,44,42,0.2);
+  border-radius:6px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  color:var(--deep);
+  outline:none;background:#fff;
+  transition:border-color 0.2s;
+}
+.search-input:focus{border-color:var(--terracotta);}
+.result-count{font-size:0.8rem;color:var(--espresso);opacity:0.5;}
+
+/* TABLE */
+.table-section{margin-bottom:3rem;}
+.table-section-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;color:var(--ink);
+  padding:0.6rem 0;margin-bottom:0.8rem;
+  border-bottom:2px solid rgba(201,169,110,0.3);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-icon{font-size:1.1rem;}
+.section-count-badge{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;
+  background:var(--warm);
+  padding:0.2rem 0.7rem;border-radius:12px;
+  color:var(--espresso);font-weight:600;
+}
+
+.clothes-table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border:1px solid rgba(201,169,110,0.2);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 12px rgba(44,24,16,0.04);
+}
+.clothes-table thead tr{
+  background:var(--espresso);
+}
+.clothes-table thead th{
+  padding:0.75rem 1rem;
+  text-align:left;
+  font-size:0.68rem;
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(247,240,230,0.6);
+  white-space:nowrap;
+}
+.clothes-table tbody tr{
+  border-bottom:1px solid rgba(201,169,110,0.1);
+  transition:background 0.15s;
+}
+.clothes-table tbody tr:last-child{border-bottom:none;}
+.clothes-table tbody tr:hover{background:rgba(247,240,230,0.5);}
+.clothes-table td{
+  padding:0.75rem 1rem;
+  font-size:0.85rem;
+  color:var(--deep);
+  vertical-align:middle;
+}
+.color-dot{
+  width:16px;height:16px;
+  border-radius:50%;
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:0.4rem;
+  border:1.5px solid rgba(0,0,0,0.1);
+}
+.status-badge{
+  padding:0.2rem 0.6rem;
+  border-radius:12px;
+  font-size:0.68rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.05em;
+}
+.status-clean{background:rgba(122,140,110,0.15);color:var(--sage);}
+.status-used{background:rgba(201,169,110,0.2);color:#8B6914;}
+
+.action-btns{display:flex;gap:0.4rem;}
+.btn-edit-sm{
+  padding:0.3rem 0.7rem;
+  background:transparent;
+  border:1.5px solid rgba(74,44,42,0.25);
+  color:var(--espresso);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;font-weight:600;
+  cursor:pointer;border-radius:4px;
+  transition:all 0.15s;
+}
+.btn-edit-sm:hover{background:var(--espresso);color:var(--cream);}
+.btn-del-sm{
+  padding:0.3rem 0.7rem;
+  background:transparent;
+  border:1.5px solid rgba(196,98,45,0.25);
+  color:var(--terracotta);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;font-weight:600;
+  cursor:pointer;border-radius:4px;
+  transition:all 0.15s;
+}
+.btn-del-sm:hover{background:var(--terracotta);color:#fff;}
+
+/* EDIT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,18,8,0.7);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--cream);width:100%;max-width:500px;border-radius:10px;overflow:hidden;box-shadow:0 40px 100px rgba(26,18,8,0.4);animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{background:var(--espresso);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-family:'Playfair Display',serif;color:var(--cream);font-size:1.3rem;}
+.modal-close{background:none;border:none;color:rgba(247,240,230,0.5);font-size:1.5rem;cursor:pointer;}
+.modal-close:hover{color:var(--cream);}
+.modal-body{padding:1.5rem 2rem;}
+.mg{margin-bottom:1rem;}
+.mg label{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--espresso);opacity:0.7;margin-bottom:0.35rem;}
+.mg input,.mg select{width:100%;padding:0.7rem 0.9rem;border:1.5px solid rgba(74,44,42,0.18);border-radius:5px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--deep);outline:none;transition:border-color 0.2s;appearance:none;}
+.mg input:focus,.mg select:focus{border-color:var(--terracotta);}
+.modal-footer{padding:0 2rem 1.5rem;display:flex;gap:0.8rem;}
+.modal-save{flex:1;padding:0.8rem;background:var(--terracotta);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;border-radius:5px;transition:background 0.2s;}
+.modal-save:hover{background:var(--espresso);}
+.modal-cancel{padding:0.8rem 1.2rem;background:transparent;border:1.5px solid rgba(74,44,42,0.2);color:var(--espresso);font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;border-radius:5px;}
+
+/* DELETE CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(26,18,8,0.7);backdrop-filter:blur(8px);z-index:300;display:none;align-items:center;justify-content:center;}
+.confirm-overlay.active{display:flex;}
+.confirm-box{background:var(--cream);max-width:380px;width:90%;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(26,18,8,0.3);padding:2rem;text-align:center;}
+.confirm-icon{font-size:3rem;margin-bottom:1rem;}
+.confirm-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem;}
+.confirm-box p{color:var(--espresso);opacity:0.6;font-size:0.88rem;margin-bottom:1.5rem;line-height:1.5;}
+.confirm-btns{display:flex;gap:0.8rem;justify-content:center;}
+.confirm-del{padding:0.7rem 1.5rem;background:var(--terracotta);color:#fff;border:none;border-radius:5px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.confirm-del:hover{background:#a0471f;}
+.confirm-cancel{padding:0.7rem 1.2rem;background:transparent;border:1.5px solid rgba(74,44,42,0.2);color:var(--espresso);border-radius:5px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+
+.toast{position:fixed;bottom:2rem;right:2rem;padding:0.9rem 1.4rem;border-radius:7px;font-size:0.88rem;font-weight:500;transform:translateY(20px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:999;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--sage);color:#fff;}
+.toast.error{background:var(--terracotta);color:#fff;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Closet<span style="font-family:'DM Sans',sans-serif;font-weight:300;opacity:0.6;font-size:1.3rem;">flow</span></div>
+    <div class="brand-sub">Smart Wardrobe</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="avatarInitial">?</div>
+    <div class="user-info">
+      <div class="name" id="sidebarName">Loading...</div>
+      <div class="uname" id="sidebarUsername">@user</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">Main</div>
+    <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/add-cloth" class="nav-item"><span class="nav-icon">➕</span> Add Clothing</a>
+    <div class="nav-section-title">Manage</div>
+    <a href="/closet" class="nav-item"><span class="nav-icon">👗</span> My Closet</a>
+    <a href="/laundry" class="nav-item"><span class="nav-icon">🧺</span> Laundry</a>
+    <a href="/all-clothes" class="nav-item active"><span class="nav-icon">📋</span> All Clothes</a>
+    <div class="nav-section-title">Insights</div>
+    <a href="/analytics" class="nav-item"><span class="nav-icon">📊</span> Analytics</a>
+    <div class="nav-section-title">Account</div>
+    <a href="/profile" class="nav-item"><span class="nav-icon">👤</span> Profile</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()"><span>⬅</span> Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">All Clothes</div>
+      <div class="page-sub">View, update and delete your wardrobe items</div>
+    </div>
+    <a href="/add-cloth" style="padding:0.6rem 1.2rem;background:var(--terracotta);color:#fff;text-decoration:none;border-radius:5px;font-size:0.82rem;font-weight:600;">+ Add New</a>
+  </div>
+  <div class="content">
+    <div class="search-row">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search by name, color, material..." oninput="renderTables()">
+      <div class="result-count" id="resultCount">0 items</div>
+    </div>
+    <div class="section-tabs" id="sectionTabs"></div>
+    <div id="tablesContainer">
+      <div style="text-align:center;padding:4rem;color:var(--espresso);opacity:0.4;font-size:0.85rem;">Loading your wardrobe...</div>
+    </div>
+  </div>
+</main>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏ Update Clothing</h3>
+      <button class="modal-close" onclick="closeEdit()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="mg">
+        <label>Name</label>
+        <input type="text" id="editName" placeholder="Clothing name">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="mg">
+          <label>Section</label>
+          <select id="editSection">
+            <option>Tops</option><option>Pants</option><option>Skirts</option>
+            <option>Dresses</option><option>Jackets</option><option>Shoes</option>
+            <option>Accessories</option><option>Ethnic</option><option>Sportswear</option><option>Other</option>
+          </select>
+        </div>
+        <div class="mg">
+          <label>Type</label>
+          <select id="editType">
+            <option>Top</option><option>Bottom</option><option>Full-length</option>
+            <option>Accessory</option><option>Footwear</option><option>Outerwear</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="mg">
+          <label>Color</label>
+          <input type="text" id="editColor">
+        </div>
+        <div class="mg">
+          <label>Fiber / Material</label>
+          <input type="text" id="editFiber">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="mg">
+          <label>Price (₹)</label>
+          <input type="number" id="editPrice">
+        </div>
+        <div class="mg">
+          <label>Purchase Date</label>
+          <input type="date" id="editDate">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-save" onclick="saveEdit()">Save Changes</button>
+      <button class="modal-cancel" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <h3>Delete Item?</h3>
+    <p>Are you sure you want to delete <strong id="confirmItemName"></strong>? This cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="confirm-del" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allClothes = [];
+let currentSection = 'all';
+let deleteId = null;
+
+const COLOR_MAP = {
+  'White':'#FFFFFF','Black':'#1A1208','Navy Blue':'#1B3A6B','Sky Blue':'#87CEEB',
+  'Red':'#C0392B','Terracotta':'#C4622D','Orange':'#E67E22','Yellow':'#F1C40F',
+  'Mustard':'#D4AC0D','Green':'#27AE60','Olive':'#7A8C6E','Pink':'#E8A598',
+  'Purple':'#8E44AD','Maroon':'#7B241C','Brown':'#6E2C0A','Beige':'#E8D5B7',
+  'Grey':'#95A5A6','Charcoal':'#2C3E50','Indigo':'#4B0082','Teal':'#1ABC9C',
+};
+const SECTION_ICONS = {
+  'Tops':'👕','Pants':'👖','Skirts':'🩱','Dresses':'👗','Jackets':'🧥',
+  'Shoes':'👟','Accessories':'💍','Ethnic':'🥻','Sportswear':'🏃','Other':'🗂️'
+};
+function getHex(c){return COLOR_MAP[c]||'#C9A96E';}
+
+async function init() {
+  const token = localStorage.getItem('cf_token');
+  if (!token) return window.location.href='/';
+  try {
+    const res = await fetch('/api/me',{headers:{Authorization:`Bearer ${token}`}});
+    if (!res.ok) return window.location.href='/';
+    const user = await res.json();
+    document.getElementById('avatarInitial').textContent=user.fullName[0].toUpperCase();
+    document.getElementById('sidebarName').textContent=user.fullName;
+    document.getElementById('sidebarUsername').textContent='@'+user.username;
+  } catch{window.location.href='/';}
+
+  // Check for section param
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('section')) currentSection = params.get('section');
+
+  await loadClothes();
+}
+
+async function loadClothes() {
+  const token = localStorage.getItem('cf_token');
+  const res = await fetch('/api/clothes',{headers:{Authorization:`Bearer ${token}`}});
+  allClothes = await res.json();
+  renderTabs();
+  renderTables();
+}
+
+function renderTabs() {
+  const sections = ['all', ...new Set(allClothes.map(c=>c.section))];
+  const tabs = document.getElementById('sectionTabs');
+  tabs.innerHTML = sections.map(s => {
+    const count = s==='all' ? allClothes.length : allClothes.filter(c=>c.section===s).length;
+    const icon = s==='all' ? '📦' : (SECTION_ICONS[s]||'🗂️');
+    return `<div class="sec-tab ${currentSection===s?'active':''}" onclick="filterSection('${s}')">
+      ${icon} ${s==='all'?'All':s} <span class="count">${count}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterSection(s) {
+  currentSection = s;
+  renderTabs();
+  renderTables();
+}
+
+function renderTables() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const sections = currentSection === 'all'
+    ? [...new Set(allClothes.map(c=>c.section))]
+    : [currentSection];
+
+  let totalShown = 0;
+  const container = document.getElementById('tablesContainer');
+
+  const html = sections.map(section => {
+    const items = allClothes.filter(c => {
+      if (c.section !== section) return false;
+      if (!q) return true;
+      return c.name.toLowerCase().includes(q)
+        || c.color.toLowerCase().includes(q)
+        || c.fiber.toLowerCase().includes(q)
+        || c.section.toLowerCase().includes(q);
+    });
+    totalShown += items.length;
+    if (items.length === 0) return '';
+
+    return `<div class="table-section">
+      <div class="table-section-title">
+        <span>${SECTION_ICONS[section]||'🗂️'} ${section}</span>
+        <span class="section-count-badge">${items.length} item${items.length!==1?'s':''}</span>
+      </div>
+      <table class="clothes-table">
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Fiber</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Used</th>
+            <th>Washed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(c=>`<tr id="row-${c.id}">
+            <td><span class="color-dot" style="background:${getHex(c.color)};border:1.5px solid rgba(0,0,0,0.12);"></span>${c.color}</td>
+            <td><strong>${c.name}</strong></td>
+            <td style="color:var(--espresso);opacity:0.7;">${c.type||'—'}</td>
+            <td style="color:var(--espresso);opacity:0.7;">${c.fiber}</td>
+            <td>₹${parseFloat(c.price).toLocaleString('en-IN')}</td>
+            <td><span class="status-badge status-${c.status}">${c.status}</span></td>
+            <td style="text-align:center;font-weight:700;">${c.used||0}</td>
+            <td style="text-align:center;font-weight:700;">${c.washed||0}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-edit-sm" onclick="openEdit('${c.id}')">✏ Edit</button>
+                <button class="btn-del-sm" onclick="openDelete('${c.id}','${c.name.replace(/'/g,"\\'")}')">🗑</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  document.getElementById('resultCount').textContent = totalShown + ' item' + (totalShown!==1?'s':'');
+
+  if (!html) {
+    container.innerHTML = `<div style="text-align:center;padding:5rem 2rem;color:var(--espresso);opacity:0.4;">
+      <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
+      <div style="font-size:1rem;font-weight:600;">No results found</div>
+      <div style="font-size:0.85rem;margin-top:0.4rem;">Try a different search or section</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML = html;
+}
+
+function openEdit(id) {
+  const c = allClothes.find(x=>x.id===id);
+  if (!c) return;
+  document.getElementById('editId').value=c.id;
+  document.getElementById('editName').value=c.name;
+  document.getElementById('editSection').value=c.section;
+  document.getElementById('editType').value=c.type||'';
+  document.getElementById('editColor').value=c.color;
+  document.getElementById('editFiber').value=c.fiber;
+  document.getElementById('editPrice').value=c.price;
+  document.getElementById('editDate').value=c.purchaseDate||'';
+  document.getElementById('editModal').classList.add('active');
+}
+function closeEdit(){document.getElementById('editModal').classList.remove('active');}
+async function saveEdit(){
+  const id=document.getElementById('editId').value;
+  const updates={
+    name:document.getElementById('editName').value,
+    section:document.getElementById('editSection').value,
+    type:document.getElementById('editType').value,
+    color:document.getElementById('editColor').value,
+    fiber:document.getElementById('editFiber').value,
+    price:document.getElementById('editPrice').value,
+    purchaseDate:document.getElementById('editDate').value,
+  };
+  const token=localStorage.getItem('cf_token');
+  const res=await fetch(`/api/clothes/${id}`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+    body:JSON.stringify(updates)
+  });
+  if(res.ok){closeEdit();await loadClothes();showToast('✓ Item updated successfully!','success');}
+  else showToast('Update failed','error');
+}
+
+function openDelete(id,name){
+  deleteId=id;
+  document.getElementById('confirmItemName').textContent=name;
+  document.getElementById('confirmOverlay').classList.add('active');
+}
+function closeConfirm(){
+  deleteId=null;
+  document.getElementById('confirmOverlay').classList.remove('active');
+}
+async function confirmDelete(){
+  if(!deleteId) return;
+  const token=localStorage.getItem('cf_token');
+  await fetch(`/api/clothes/${deleteId}`,{
+    method:'DELETE',headers:{Authorization:`Bearer ${token}`}
+  });
+  closeConfirm();
+  await loadClothes();
+  showToast('Item deleted','success');
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type;
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+async function logout(){
+  await fetch('/api/logout',{method:'POST'});
+  localStorage.clear();window.location.href='/';
+}
+document.getElementById('editModal').addEventListener('click',e=>{if(e.target===document.getElementById('editModal'))closeEdit();});
+document.getElementById('confirmOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('confirmOverlay'))closeConfirm();});
+init();
+</script>
+</body>
+</html>
